@@ -1,0 +1,27 @@
+capsule Top{
+    part greeters : HelloLog[10];
+
+    statemachine{
+        state State;
+        initial->State;
+    };
+};
+
+capsule HelloLog{
+
+    behavior port log : Log;
+
+    statemachine{
+        state Hello;
+        initial->Hello
+        `
+            log.show(getName());
+            log.show("[");
+            log.show(getIndex());
+            log.show("]");
+            log.log(": Hello World");
+            log.commit();
+            context()->abort();
+        `;
+    };
+};
