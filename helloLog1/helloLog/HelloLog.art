@@ -1,0 +1,15 @@
+capsule HelloLog{
+
+    behavior port log : Log;
+
+    statemachine{
+        state Hello;
+        initial->Hello
+        `
+            log.show(getName());
+            log.log(": Hello World");
+            log.commit();
+            context()->abort();
+        `;
+    };
+};
