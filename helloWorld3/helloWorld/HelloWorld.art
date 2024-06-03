@@ -1,0 +1,21 @@
+capsule HelloWorld{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    statemachine{
+        initial->Hello
+        `
+            std::cout << "Hello ";
+        `;
+        state Hello{
+            entry
+            `
+                std::cout << "World" << std::endl;
+                context()->abort();
+            `;
+        };
+    };
+};
