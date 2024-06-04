@@ -1,0 +1,25 @@
+capsule HelloTimer{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    behavior port timer : Timing;
+
+    statemachine{
+        initial->Hello;
+        state Hello{
+            entry
+            `
+                std::cout << "Hello World" << std::endl;
+                timer.informIn(RTTimespec(2,0));
+            `;
+            timeout: on timer.timeout
+            `
+                std::cout << "Goodbye World" << std::endl;
+                context()->abort();
+            `;
+        };
+    };
+};

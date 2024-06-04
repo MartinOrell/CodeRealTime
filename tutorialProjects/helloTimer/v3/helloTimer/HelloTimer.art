@@ -1,0 +1,41 @@
+capsule HelloTimer{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    [[rt::decl]]
+    `
+        RTTimerId repeatTimerId;
+    `
+
+    behavior port repeatTimer : Timing;
+    behavior port endTimer : Timing;
+
+    statemachine{
+        initial->Hello;
+        state Hello{
+            entry
+            `
+                std::cout << "Hello World" << std::endl;
+                repeatTimerId = repeatTimer.informEvery(RTTimespec(0,500000000));
+                endTimer.informIn(RTTimespec(3,0));
+            `;
+            exit
+            `
+                repeatTimer.cancelTimer(repeatTimerId);
+            `;
+            timeout: on repeatTimer.timeout
+            `
+                std::cout << "Hello World" << std::endl;
+            `;
+        };
+        Hello->End on endTimer.timeout
+        `
+            std::cout << "Goodbye World" << std::endl;
+            context()->abort();
+        `;
+        state End;
+    };
+};
