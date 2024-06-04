@@ -1,0 +1,32 @@
+capsule HelloTimer{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    behavior port timer : Timing;
+
+    statemachine{
+        state Hello, End;
+        initial->Hello
+        `
+            std::cout << "Hello World" << std::endl;
+            RTTimespec currentTime;
+            RTTimespec::getclock(currentTime);
+            std::cout << currentTime.tv_sec << " seconds and " << currentTime.tv_nsec
+                << " nanoseconds has passed since 00:00:00 GMT, Jan 1, 1970"
+                << std::endl;
+            RTTimespec timeoutTime = currentTime + RTTimespec(10,0);
+            timer.informAt(timeoutTime);
+            std::cout << "The world will be destroyed at "
+                << timeoutTime.tv_sec << " seconds"
+                << std::endl;
+        `;
+        Hello->End on timer.timeout
+        `
+            std::cout << "Goodbye World" << std::endl;
+            context()->abort();
+        `;
+    };
+};
