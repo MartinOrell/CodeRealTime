@@ -1,0 +1,47 @@
+capsule Top{
+    [[rt::header_preface]]
+    `
+        #include "Greeter.h"
+    `
+
+    part greeter : Greeter [[rt::create]]
+    `
+        return new Greeter_Actor(rtg_rts, rtg_ref, 12);
+    `;
+
+    statemachine{
+        state State;
+        initial->State;
+    };
+};
+
+capsule Greeter{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    [[rt::decl]]
+    `
+        public:
+            Greeter_Actor(RTController*, RTActorRef*, int);
+        private:
+            int _age;
+    `
+
+    [[rt::impl]]
+    `
+        Greeter_Actor::Greeter_Actor(RTController* rtg_rts, RTActorRef* rtg_ref, int age)
+            :RTActor(rtg_rts, rtg_ref), _age(age){} 
+    `
+
+    statemachine{
+        state Hello;
+        initial->Hello
+        `
+            std::cout << "Hi, I'm " << _age << std::endl;
+            context()->abort();
+        `;
+    };
+};
