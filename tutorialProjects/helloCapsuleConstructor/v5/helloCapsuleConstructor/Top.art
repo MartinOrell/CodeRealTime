@@ -1,0 +1,23 @@
+capsule Top{
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+        #include "CapsuleFactory.art.h"
+        #include "Greeter.h"
+    `
+
+    optional part greeter : Greeter;
+
+    behavior port frame : Frame;
+
+    statemachine{
+        state State;
+        initial->State
+        `
+            RTActorId id = frame.incarnate(greeter);
+            if(!id.isValid()){
+                std::cerr << "Failed to incarnate greeter" << std::endl;
+            }
+        `;
+    };
+};

@@ -1,0 +1,29 @@
+[[rt::decl]]
+`
+    #include "Greeter.h"
+
+    template <class T>
+    class CapsuleFactory : public RTActorFactoryInterface{
+        public:
+            CapsuleFactory(int age) : _age(age){};
+
+            RTActor *create(RTController *rtg_rts, RTActorRef *rtg_ref, int index) override{
+                return new T(rtg_rts, rtg_ref, _age);
+            }
+
+            void destroy(RTActor* actor) override{
+                delete actor;
+            }
+
+            static CapsuleFactory<T> factory;
+
+        private:
+            int _age;
+    };
+`
+
+[[rt::impl]]
+`
+    template<>
+    CapsuleFactory<Greeter_Actor> CapsuleFactory<Greeter_Actor>::factory(12);
+`
