@@ -1,0 +1,45 @@
+capsule Top{
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    [[rt::decl]]
+    `
+        int _seconds;
+    `
+
+    optional part worker1 : Worker;
+    optional part worker2 : Worker;
+    optional part worker3 : Worker;
+
+    behavior port frame : Frame;
+    behavior port tickTimer : Timing;
+    behavior port timeoutTimer : Timing;
+
+    statemachine{
+        initial->Running;
+        state Running{
+            entry
+            `
+                tickTimer.informEvery(RTTimespec(1,0));
+                timeoutTimer.informIn(RTTimespec(10,0));
+                std::cout << "Incarnate worker 1\n";
+                frame.incarnate(worker1, nullptr, nullptr, L2, -1);//L2 defined in .tcjs file
+                std::cout << "Incarnate worker 2\n";
+                frame.incarnate(worker2, nullptr, nullptr, L3, -1);//L3 defined in .tcjs file
+                std::cout << "Incarnate worker 3\n";
+                frame.incarnate(worker3, nullptr, nullptr, L4, -1);//L4 defined in .tcjs file
+            `;
+            tick: on tickTimer.timeout
+            `
+                _seconds++;
+                std::cout << std::to_string(_seconds) + " seconds has passed\n";
+            `;
+            end: on timeoutTimer.timeout
+            `
+                context()->abort();
+            `;
+        };
+    };
+};
