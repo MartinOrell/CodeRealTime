@@ -1,0 +1,67 @@
+capsule Top{
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+        #include "Greeter.h"
+    `
+
+    optional part greeters : Greeter[10];
+
+    behavior port frame : Frame;
+
+    statemachine{
+        state State;
+        initial->State
+        `
+            for(int i = 0; i < 10; i++)
+            {
+                int greeterAge = 12 + i;
+                RTActorId id = frame.incarnateCustom
+                (
+                    greeters,
+                    RTActorFactory(
+                        [this, greeterAge](RTController * rtg_rts, RTActorRef* rtg_ref, int age)
+                        {
+                            return new Greeter_Actor(rtg_rts,rtg_ref, greeterAge);
+                        }
+                    )
+                );
+                if(!id.isValid()){
+                    std::cerr << "Failed to incarnate greeter " << i << std::endl;
+                }
+            }
+            
+        `;
+    };
+};
+
+capsule Greeter{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    [[rt::decl]]
+    `
+        public:
+            Greeter_Actor(RTController*, RTActorRef*, int);
+        private:
+            int _age;
+    `
+
+    [[rt::impl]]
+    `
+        Greeter_Actor::Greeter_Actor(RTController* rtg_rts, RTActorRef* rtg_ref, int age)
+            :RTActor(rtg_rts, rtg_ref), _age(age){} 
+    `
+
+    statemachine{
+        state Hello;
+        initial->Hello
+        `
+            std::cout << "Hi, I'm " << _age << std::endl;
+            context()->abort();
+        `;
+    };
+};
