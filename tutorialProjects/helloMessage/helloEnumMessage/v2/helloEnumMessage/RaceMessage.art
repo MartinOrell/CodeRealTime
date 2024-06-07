@@ -1,0 +1,5 @@
+[[rt::decl]]
+`
+    #include "Race.h"
+    typedef Race [[rf::auto_descriptor]] RaceMessage;
+`

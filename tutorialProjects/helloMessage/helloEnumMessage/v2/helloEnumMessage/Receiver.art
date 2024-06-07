@@ -1,0 +1,34 @@
+capsule Receiver{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+        #include "Race.h"
+    `
+
+    service behavior port messagePort~ : Protocol;
+
+    statemachine{
+        initial -> Receiving;
+        state Receiving{
+            message: on messagePort.message
+            `
+                Race race = *rtdata;
+                std::cout << getName() << ": Received: ";
+                switch(race){
+                    case angel:
+                        std::cout << "angel";
+                        break;
+                    case demon:
+                        std::cout << "demon";
+                        break;
+                    default: //human
+                        std::cout << "human";
+                }
+                std::cout << std::endl;
+                context()->abort();
+            `;
+        };
+        
+    };
+};

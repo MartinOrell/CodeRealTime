@@ -1,0 +1,22 @@
+capsule Sender{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+        #include "Race.h"
+    `
+
+    service behavior port messagePort : Protocol;
+
+    statemachine{
+        state Sending{
+            entry
+            `
+                Race race = demon;
+                std::cout << getName() << ": Sending: demon" << std::endl;
+                messagePort.message(race).send();
+            `;
+        };
+        initial -> Sending;
+    };
+};

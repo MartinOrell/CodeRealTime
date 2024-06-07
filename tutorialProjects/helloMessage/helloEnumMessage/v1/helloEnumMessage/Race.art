@@ -1,0 +1,6 @@
+[[rt::decl]]
+`
+    enum [[rt::auto_descriptor]] Race{
+        human, angel, demon
+    };
+`

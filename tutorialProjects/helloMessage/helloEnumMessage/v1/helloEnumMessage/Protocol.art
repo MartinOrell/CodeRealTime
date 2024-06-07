@@ -1,0 +1,7 @@
+protocol Protocol{
+    [[rt::header_preface]]
+    `
+        #include "Race.art.h"
+    `
+    out message(`Race`);
+};
