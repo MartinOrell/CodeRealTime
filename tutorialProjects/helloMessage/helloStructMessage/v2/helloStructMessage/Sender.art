@@ -1,0 +1,24 @@
+capsule Sender{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+        #include "Sword.h"
+    `
+
+    service behavior port messagePort : Protocol;
+
+    statemachine{
+        state Sending{
+            entry
+            `
+                Sword sword;
+                sword.attack = 20;
+                sword.durability = 75;
+                std::cout << getName() << ": Sending sword" << std::endl;
+                messagePort.message(sword).send();
+            `;
+        };
+        initial -> Sending;
+    };
+};

@@ -1,0 +1,25 @@
+capsule Receiver{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+        #include "Sword.art.h"
+    `
+
+    service behavior port messagePort~ : Protocol;
+
+    statemachine{
+        initial -> Receiving;
+        state Receiving{
+            message: on messagePort.message
+            `
+                Sword sword = *rtdata;
+                std::cout << getName() << ": Received sword with:" << std::endl;
+                std::cout << "Attack: " << sword.attack << std::endl;
+                std::cout << "Durability: " << sword.durability << std::endl;
+                context()->abort();
+            `;
+        };
+        
+    };
+};

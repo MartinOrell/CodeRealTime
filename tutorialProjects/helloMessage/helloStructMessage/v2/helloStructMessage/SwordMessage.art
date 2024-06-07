@@ -1,0 +1,5 @@
+[[rt::decl]]
+`
+    #include "Sword.h"
+    typedef Sword [[rf::auto_descriptor]] SwordMessage;
+`

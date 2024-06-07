@@ -1,0 +1,7 @@
+[[rt::decl]]
+`
+    struct [[rt::auto_descriptor]] Sword{
+        int attack;
+        int durability;
+    };
+`

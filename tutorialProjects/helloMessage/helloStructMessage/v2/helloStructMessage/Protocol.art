@@ -1,0 +1,7 @@
+protocol Protocol{
+    [[rt::header_preface]]
+    `
+        #include "SwordMessage.art.h"
+    `
+    out message(`SwordMessage`);
+};
