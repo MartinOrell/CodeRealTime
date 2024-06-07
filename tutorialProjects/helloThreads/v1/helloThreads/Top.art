@@ -24,12 +24,23 @@ capsule Top{
             `
                 tickTimer.informEvery(RTTimespec(1,0));
                 timeoutTimer.informIn(RTTimespec(10,0));
+                RTActorId id;
                 std::cout << "Incarnate worker 1\n";
-                frame.incarnate(worker1, nullptr, nullptr, L2, -1);//L2 defined in .tcjs file
+                id = frame.incarnate(worker1, nullptr, nullptr, L2, -1);//L2 defined in .tcjs file
+                if(!id.isValid()){
+                    std::cerr << "Failed to incarnate worker 1\n";
+                }
                 std::cout << "Incarnate worker 2\n";
-                frame.incarnate(worker2, nullptr, nullptr, L3, -1);//L3 defined in .tcjs file
+                id = frame.incarnate(worker2, nullptr, nullptr, L3, -1);//L3 defined in .tcjs file
+                if(!id.isValid()){
+                    std::cerr << "Failed to incarnate worker 2\n";
+                }
                 std::cout << "Incarnate worker 3\n";
-                frame.incarnate(worker3, nullptr, nullptr, L4, -1);//L4 defined in .tcjs file
+                id = frame.incarnate(worker3, nullptr, nullptr, L4, -1);//L4 defined in .tcjs file
+                if(!id.isValid()){
+                    std::cerr << "Failed to incarnate worker 3\n";
+                }
+
             `;
             tick: on tickTimer.timeout
             `

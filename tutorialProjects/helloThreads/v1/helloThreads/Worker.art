@@ -8,8 +8,8 @@ capsule Worker{
     `
 
     statemachine{
-        initial->Hello;
-        state Hello{
+        initial->Working;
+        state Working{
             entry
             `
                 std::cout << (std::string)getName() + ": Working for 3 seconds\n";
