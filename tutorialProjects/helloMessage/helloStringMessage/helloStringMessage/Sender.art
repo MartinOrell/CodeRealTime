@@ -1,0 +1,21 @@
+capsule Sender{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    service behavior port messagePort : Protocol;
+
+    statemachine{
+        state Sending{
+            entry
+            `
+                std::string s = "Hello World";
+                std::cout << getName() << ": Sending: " << s << std::endl;
+                messagePort.message(s).send();
+            `;
+        };
+        initial -> Sending;
+    };
+};
