@@ -1,0 +1,21 @@
+capsule Receiver{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    service behavior port messagePort~ : Protocol;
+
+    statemachine{
+        initial -> Receiving;
+        state Receiving{
+            message: on messagePort.message
+            `
+                std::cout << getName() << ": Message received" << std::endl;
+                context()->abort();
+            `;
+        };
+        
+    };
+};
