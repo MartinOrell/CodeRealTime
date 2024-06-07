@@ -1,0 +1,22 @@
+capsule Sender{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+        #include "Shield.h"
+    `
+
+    service behavior port messagePort : Protocol;
+
+    statemachine{
+        state Sending{
+            entry
+            `
+                Shield shield{10,200};
+                std::cout << getName() << ": Sending shield" << std::endl;
+                messagePort.message(shield).send();
+            `;
+        };
+        initial -> Sending;
+    };
+};

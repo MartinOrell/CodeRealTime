@@ -1,0 +1,7 @@
+protocol Protocol{
+    [[rt::header_preface]]
+    `
+        #include "ShieldMessage.art.h"
+    `
+    out message(`ShieldMessage`);
+};

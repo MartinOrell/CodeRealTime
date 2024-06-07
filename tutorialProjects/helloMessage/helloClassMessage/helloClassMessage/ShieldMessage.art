@@ -1,0 +1,5 @@
+[[rt::decl]]
+`
+    #include "Shield.h"
+    typedef Shield [[rf::auto_descriptor]] ShieldMessage;
+`
