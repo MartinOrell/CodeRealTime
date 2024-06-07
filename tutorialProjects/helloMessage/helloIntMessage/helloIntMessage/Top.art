@@ -1,0 +1,12 @@
+capsule Top{
+    part sender : Sender;
+    part receiver : Receiver;
+
+    connect sender.messagePort with receiver.messagePort;
+
+    statemachine{
+        state State;
+        initial->State;
+    };
+
+};
