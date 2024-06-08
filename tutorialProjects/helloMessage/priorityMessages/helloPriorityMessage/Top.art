@@ -1,0 +1,22 @@
+capsule Top{
+    part sender : Sender;
+    part receiver : Receiver;
+
+    connect sender.messagePort with receiver.messagePort;
+
+    behavior port timeoutTimer : Timing;
+
+    statemachine{
+        initial->Running
+        `
+            timeoutTimer.informIn(RTTimespec(1,0));
+        `;
+        state Running{
+            end: on timeoutTimer.timeout
+            `
+                context()->abort();
+            `;
+        };
+    };
+
+};
