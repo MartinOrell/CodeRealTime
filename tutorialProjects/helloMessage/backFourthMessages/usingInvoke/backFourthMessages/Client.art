@@ -1,0 +1,24 @@
+capsule Client{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    service notify behavior port serverPort : Protocol;
+
+    statemachine{
+        state WaitForConnection, End;
+        initial->WaitForConnection; //must connect before calling invoke
+        request: WaitForConnection->End on serverPort.rtBound
+        `
+            int i = 5;
+            std::cout << getName() << ": Sending: " << i << std::endl;
+            RTMessage replyMsg;
+            serverPort.request(i).invoke(&replyMsg);
+            int r = *static_cast<int*>(replyMsg.getData());
+            std::cout << getName() << ": Received: " << r << std::endl;
+            context()->abort();
+        `;
+    };
+};

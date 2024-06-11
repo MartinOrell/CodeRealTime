@@ -1,0 +1,25 @@
+capsule Client{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    service behavior port serverPort : Protocol;
+
+    statemachine{
+        state WaitForResponse, End;
+        sendRequest: initial->WaitForResponse
+        `
+            int i = 5;
+            std::cout << getName() << ": Sending: " << i << std::endl;
+            serverPort.request(i).send();
+        `;
+        receiveResponse: WaitForResponse->End on serverPort.response
+        `
+            int i = *((int*) rtdata);
+            std::cout << getName() << ": Received: " << i << std::endl;
+            context()->abort();
+        `;
+    };
+};

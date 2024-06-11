@@ -1,0 +1,24 @@
+capsule Server{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    service behavior port clientPort~ : Protocol;
+
+    statemachine{
+        initial -> Running;
+        state Running{
+            message: on clientPort.request
+            `
+                int i = *((int*) rtdata);
+                std::cout << getName() << ": Received: " << i << std::endl;
+                i++;
+                std::cout << getName() << ": Sending: " << i << std::endl;
+                clientPort.response(i).send();
+            `;
+        };
+        
+    };
+};
