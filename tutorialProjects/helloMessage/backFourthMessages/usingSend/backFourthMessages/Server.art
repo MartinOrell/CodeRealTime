@@ -10,7 +10,7 @@ capsule Server{
     statemachine{
         initial -> Running;
         state Running{
-            message: on clientPort.request
+            request: on clientPort.request
             `
                 int i = *((int*) rtdata);
                 std::cout << getName() << ": Received: " << i << std::endl;

@@ -9,8 +9,9 @@ capsule Server{
 
     statemachine{
         initial -> Running;
-        state Running;
-        request: Running->Running on clientPort.request
+        state Running
+        {
+            request: on clientPort.request
             `
                 int i = *((int*) rtdata);
                 std::cout << getName() << ": Received: " << i << std::endl;
@@ -18,6 +19,6 @@ capsule Server{
                 std::cout << getName() << ": Sending: " << i << std::endl;
                 clientPort.response(i).reply();
             `;
-        
+        };
     };
 };
