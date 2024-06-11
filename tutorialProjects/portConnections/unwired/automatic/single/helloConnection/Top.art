@@ -1,0 +1,14 @@
+capsule Top{
+    part sender : Sender;
+    part receiver : Receiver;
+
+    //sender and receiver are unwired,
+    //but will connect automatically
+    //sender as a subscriber
+    //receiver as a publisher
+
+    statemachine{
+        state State;
+        initial->State;
+    };
+};

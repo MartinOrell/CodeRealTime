@@ -1,0 +1,14 @@
+capsule Top{
+    part sender : Sender;
+    part receiver : Receiver;
+
+    //sender and receiver are unwired,
+    //but will connect programmatically
+    //sender using SAP (like a client)
+    //receiver using SPP (like a server)
+
+    statemachine{
+        state State;
+        initial->State;
+    };
+};

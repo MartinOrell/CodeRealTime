@@ -1,0 +1,24 @@
+capsule Top{
+    part sender1 : Sender;
+    part sender2 : Sender;
+    part receiver : Receiver;
+
+    //sender and receiver are unwired,
+    //but will connect automatically
+    //sender as a subscriber
+    //receiver as a publisher
+
+    behavior port timeoutTimer : Timing;
+
+    statemachine{
+        state Running, End;
+        initial->Running
+        `
+            timeoutTimer.informIn(RTTimespec(1,0));
+        `;
+        end: Running->End on timeoutTimer.timeout
+        `
+            context()->abort();
+        `;
+    };
+};

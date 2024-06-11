@@ -1,0 +1,28 @@
+capsule Receiver{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+        #include "macro.h"
+    `
+
+    publish service notify behavior unwired port messagePort~
+    [[rt::properties(
+        registration_name="messageService"
+    )]]: Protocol[`NUM_SENDERS`];
+
+    statemachine{
+        initial -> Receiving;
+        state Receiving{
+            connected: on messagePort.rtBound
+            `
+                std::cout << getName() << ": Connected to a sender" << std::endl;
+            `;
+            message: on messagePort.message
+            `
+                int i = *((int*) rtdata);
+                std::cout << getName() << ": Received: " << i << std::endl;
+            `;
+        };
+    };
+};

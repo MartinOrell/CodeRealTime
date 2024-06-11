@@ -1,0 +1,30 @@
+capsule Sender{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    subscribe service notify behavior unwired port messagePort
+    [[rt::properties(
+        registration_name="messageService"
+    )]]: Protocol;
+
+    statemachine{
+        state WaitForConnection, Sending;
+        initial->WaitForConnection
+        `
+            std::cout << getName() << "[" << getIndex() << "]"
+                << ": Waiting for connection" << std::endl;
+        `;
+        connected: WaitForConnection -> Sending on messagePort.rtBound
+        `
+            std::cout << getName() << "[" << getIndex() << "]"
+                << ": Connected to receiver" << std::endl;
+            int i = getIndex();
+            std::cout << getName() << "[" << getIndex() << "]"
+                << ": Sending: " << i << std::endl;
+            messagePort.message(i).send();
+        `;
+    };
+};
