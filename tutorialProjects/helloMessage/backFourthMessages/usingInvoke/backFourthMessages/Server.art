@@ -9,8 +9,7 @@ capsule Server{
 
     statemachine{
         initial -> Running;
-        state Running
-        {
+        state Running{
             request: on clientPort.request
             `
                 int i = *((int*) rtdata);
