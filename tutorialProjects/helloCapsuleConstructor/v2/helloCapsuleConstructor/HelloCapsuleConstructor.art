@@ -17,9 +17,9 @@ capsule Top{
             (
                 greeter,
                 RTActorFactory(
-                    [this](RTController * rtg_rts, RTActorRef* rtg_ref, int age)
+                    [this](RTController * rtg_rts, RTActorRef* rtg_ref, int index)
                     {
-                        return new Greeter_Actor(rtg_rts,rtg_ref, 12);
+                        return new Greeter_Actor(rtg_rts,rtg_ref, "Donald", "Duck");
                     }
                 )
             );
@@ -40,22 +40,23 @@ capsule Greeter{
     [[rt::decl]]
     `
         public:
-            Greeter_Actor(RTController*, RTActorRef*, int);
+            Greeter_Actor(RTController*, RTActorRef*, std::string, std::string);
         private:
-            int _age;
+            std::string _firstName;
+            std::string _lastName;
     `
 
     [[rt::impl]]
     `
-        Greeter_Actor::Greeter_Actor(RTController* rtg_rts, RTActorRef* rtg_ref, int age)
-            :RTActor(rtg_rts, rtg_ref), _age(age){} 
+        Greeter_Actor::Greeter_Actor(RTController* rtg_rts, RTActorRef* rtg_ref, std::string firstName, std::string lastName)
+            :RTActor(rtg_rts, rtg_ref), _firstName(firstName), _lastName(lastName){}
     `
 
     statemachine{
         state Hello;
         initial->Hello
         `
-            std::cout << "Hi, I'm " << _age << std::endl;
+            std::cout << "Hi, I'm " << _firstName << " " << _lastName << std::endl;
             context()->abort();
         `;
     };

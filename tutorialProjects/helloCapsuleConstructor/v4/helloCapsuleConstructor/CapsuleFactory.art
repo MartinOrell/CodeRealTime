@@ -5,7 +5,7 @@
     class CapsuleFactory : public RTActorFactoryInterface{
         public:
             RTActor *create(RTController *rtg_rts, RTActorRef *rtg_ref, int index) override{
-                return new Greeter_Actor(rtg_rts, rtg_ref, 12);
+                return new Greeter_Actor(rtg_rts,rtg_ref, "Donald", "Duck");
             }
 
             void destroy(RTActor* actor) override{

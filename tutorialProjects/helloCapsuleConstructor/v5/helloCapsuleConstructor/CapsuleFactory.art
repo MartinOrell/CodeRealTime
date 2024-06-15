@@ -5,10 +5,11 @@
     template <class T>
     class CapsuleFactory : public RTActorFactoryInterface{
         public:
-            CapsuleFactory(int age) : _age(age){};
+            CapsuleFactory(std::string firstName, std::string lastName)
+            : _firstName(firstName), _lastName(lastName){};
 
             RTActor *create(RTController *rtg_rts, RTActorRef *rtg_ref, int index) override{
-                return new T(rtg_rts, rtg_ref, _age);
+                return new T(rtg_rts, rtg_ref, _firstName, _lastName);
             }
 
             void destroy(RTActor* actor) override{
@@ -18,12 +19,13 @@
             static CapsuleFactory<T> factory;
 
         private:
-            int _age;
+            std::string _firstName;
+            std::string _lastName;
     };
 `
 
 [[rt::impl]]
 `
     template<>
-    CapsuleFactory<Greeter_Actor> CapsuleFactory<Greeter_Actor>::factory(12);
+    CapsuleFactory<Greeter_Actor> CapsuleFactory<Greeter_Actor>::factory("Donald", "Duck");
 `
