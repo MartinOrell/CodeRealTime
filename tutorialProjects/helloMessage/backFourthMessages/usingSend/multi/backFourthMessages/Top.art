@@ -1,0 +1,22 @@
+capsule Top{
+    part clients : Client[3];
+    part server : Server;
+
+    //connect clients.serverPort with server.clientPort;
+    //Bug with multiplicity in version 1.0.3
+    //Unwired automatic connection made at the moment (should be changed later)
+
+    behavior port timer: Timing;
+
+    statemachine{
+        state Running, End;
+        initial->Running
+        `
+            timer.informIn(RTTimespec(1,0));
+        `;
+        Running->End on timer.timeout
+        `
+            context()->abort();
+        `;
+    };
+};

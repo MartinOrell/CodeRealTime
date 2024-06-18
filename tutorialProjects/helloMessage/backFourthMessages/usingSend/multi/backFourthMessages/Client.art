@@ -1,0 +1,27 @@
+capsule Client{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    subscribe notify service behavior unwired port messagePort : Protocol;
+
+    statemachine{
+        
+
+        state WaitForConnection, WaitForResponse, End;
+        initial->WaitForConnection;
+        sendRequest: WaitForConnection->WaitForResponse on messagePort.rtBound
+        `
+            int i = 5;
+            std::cout << getName() << "[" << getIndex() << "]: Sending: " << i << std::endl;
+            messagePort.request(i).send();
+        `;
+        receiveResponse: WaitForResponse->End on messagePort.response
+        `
+            int i = *((int*) rtdata);
+            std::cout << getName() << "[" << getIndex() << "]: Received: " << i << std::endl;
+        `;
+    };
+};

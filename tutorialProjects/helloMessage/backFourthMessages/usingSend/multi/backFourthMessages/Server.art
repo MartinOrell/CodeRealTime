@@ -1,0 +1,24 @@
+capsule Server{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    publish service behavior unwired port messagePort~ : Protocol[3];
+
+    statemachine{
+        initial -> Running;
+        state Running{
+            request: on messagePort.request
+            `
+                int i = *((int*) rtdata);
+                int index = (*getMsg()).sapIndex0();
+                std::cout << getName() << ": Received: " << i << " on port: " << index << std::endl;
+                i++;
+                std::cout << getName() << ": Sending: " << i << " on port: " << index << std::endl;
+                messagePort.response(i).sendAt(index);
+            `;
+        };
+    };
+};
