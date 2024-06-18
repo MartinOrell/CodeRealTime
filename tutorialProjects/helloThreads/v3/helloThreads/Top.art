@@ -1,0 +1,48 @@
+capsule Top{
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    [[rt::decl]]
+    `
+        int _seconds;
+    `
+
+    optional part workers : Worker[3];
+
+    behavior port frame : Frame;
+    behavior port tickTimer : Timing;
+    behavior port timeoutTimer : Timing;
+
+    statemachine{
+        initial->Running;
+        state Running{
+            entry
+            `
+                _seconds = 0;
+                tickTimer.informEvery(RTTimespec(1,0));
+                timeoutTimer.informIn(RTTimespec(10,0));
+                RTActorId id;
+                RTController* threadList[] = {L2, L3, L4}; //L2,L3,L4 defined in .tcjs file
+
+                for(int i = 0; i < 3; i++){
+                    std::cout << "Incarnate worker " + std::to_string(i) + "\n";
+                    id = frame.incarnate(workers, nullptr, nullptr, threadList[i], -1);
+                    if(!id.isValid()){
+                        std::cerr << "Failed to incarnate worker " + std::to_string(i) + "\n";
+                    }
+                }
+            `;
+            tick: on tickTimer.timeout
+            `
+                _seconds++;
+                std::cout << std::to_string(_seconds) + " seconds has passed\n";
+            `;
+            end: on timeoutTimer.timeout
+            `
+                context()->abort();
+            `;
+        };
+    };
+};
