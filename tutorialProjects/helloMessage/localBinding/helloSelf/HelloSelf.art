@@ -1,0 +1,28 @@
+protocol Protocol{
+    out message();
+};
+
+capsule Main{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    behavior port outPort : Protocol, inPort~ : Protocol;
+    connect outPort with inPort;
+
+    statemachine{
+        state LookingForFriend, FoundHimself;
+        initial->LookingForFriend
+        `
+            std::cout << "Hello!" << std::endl;
+            outPort.message().send();
+        `;
+        heardEcho: LookingForFriend->FoundHimself on inPort.message
+        `
+            std::cout << "Hello friend!" << std::endl;
+            context()->abort();
+        `;
+    };
+};
