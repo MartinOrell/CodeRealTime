@@ -1,0 +1,31 @@
+protocol Protocol{
+    out message();
+};
+
+capsule Main{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    behavior port outPort : Protocol, inPort~ : Protocol;
+    connect outPort with inPort;
+
+    statemachine{
+        initial->Running;
+        state Running{
+            entry
+            `
+                std::cout << "Sending transition message" << std::endl;
+                outPort.message().send();
+            `;
+            internalTransition: on inPort.message
+            `
+                std::cout << "Hello Internal transition" << std::endl;
+                std::cout << "We remain in the same state" << std::endl;
+                context()->abort();
+            `;
+        };
+    };
+};

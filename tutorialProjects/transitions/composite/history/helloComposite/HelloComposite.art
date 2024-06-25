@@ -1,0 +1,66 @@
+protocol Protocol{
+    out message(), endMessage();
+};
+
+capsule Main{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    behavior port outPort : Protocol, inPort~ : Protocol;
+    connect outPort with inPort;
+
+    statemachine{
+        initial->Start;
+        state Start{
+            entry
+            `
+                outPort.message().send();
+            `;
+        };
+        enterComposite: Start->Composite.historyEntryPoint on inPort.message;
+        state Composite{
+            entry
+            `
+                std::cout << "Hello from " << getCurrentStateString() << std::endl;
+            `;
+            entrypoint historyEntryPoint;
+            exitpoint exitPoint1;
+            initial->Alpha;//State that will be entered when using history* the first time
+            historyEntryPoint-> history*;
+            state Alpha{
+                entry
+                `
+                    std::cout << "Hello from " << getCurrentStateString() << std::endl;
+                    outPort.message().send();
+                `;
+            };
+            Alpha->Beta on inPort.message;
+            state Beta{
+                entry
+                `
+                    std::cout << "Hello from " << getCurrentStateString() << std::endl;
+                    outPort.message().send();
+                `;
+            };
+            Beta->exitPoint1 on inPort.message;
+        };
+        reenterComposite: Composite.exitPoint1->Composite.historyEntryPoint
+        //When we enter Composite (using history*)
+        //the last state (Beta) will be entered
+        `
+            outPort.endMessage().send();
+        `;
+        exitComposite: Composite->End on inPort.endMessage;
+        state End
+        {
+            entry
+            `
+                std::cout << "Goodbye!" << std::endl;
+                context()->abort();
+            `;
+        };
+    };
+};

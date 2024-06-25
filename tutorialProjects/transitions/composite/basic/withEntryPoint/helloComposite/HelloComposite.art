@@ -1,0 +1,50 @@
+protocol Protocol{
+    out message();
+};
+
+capsule Main{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    behavior port outPort : Protocol, inPort~ : Protocol;
+    connect outPort with inPort;
+
+    statemachine{
+        initial->Start;
+        state Start{
+            entry
+            `
+                outPort.message().send();
+            `;
+        };
+        enterComposite: Start->Composite.entryPoint1 on inPort.message;
+        state Composite{
+            entry
+            `
+                std::cout << "Hello from " << getCurrentStateString() << std::endl;
+            `;
+            entrypoint entryPoint1;
+            exitpoint exitPoint1;
+            entryPoint1->Alpha;
+            state Alpha{
+                entry
+                `
+                    std::cout << "Hello from " << getCurrentStateString() << std::endl;
+                    outPort.message().send();
+                `;
+            };
+            Alpha->exitPoint1 on inPort.message;
+        };
+        exitComposite: Composite.exitPoint1->End;
+        state End
+        {
+            entry
+            `
+                context()->abort();
+            `;
+        };
+    };
+};

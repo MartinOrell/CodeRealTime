@@ -1,0 +1,38 @@
+protocol Protocol{
+    out message();
+};
+
+capsule Main{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    behavior port outPort : Protocol, inPort~ : Protocol;
+    connect outPort with inPort;
+
+    statemachine{
+        initial->First;
+        state First{
+            entry
+            `
+                std::cout << "Entered state " << getCurrentStateString() << std::endl;
+                std::cout << "Sending transition message" << std::endl;
+                outPort.message().send();
+            `;
+        };
+        externalTransition: First->Second on inPort.message
+        `
+            std::cout << "Hello External transition" << std::endl;
+        `;
+        state Second
+        {
+            entry
+            `
+                std::cout << "Entered state " << getCurrentStateString() << std::endl;
+                context()->abort();
+            `;
+        };
+    };
+};

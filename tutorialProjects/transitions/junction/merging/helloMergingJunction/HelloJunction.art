@@ -1,0 +1,52 @@
+protocol Protocol{
+    out message1(), message2(), message3();
+};
+
+capsule Main{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    behavior port outPort : Protocol, inPort~ : Protocol;
+    connect outPort with inPort;
+
+    statemachine{
+        initial->Start;
+        state Start{
+            entry
+            `
+                std::cout << "Entered state " << getCurrentStateString() << std::endl;
+                std::cout << "Sending transition message" << std::endl;
+                outPort.message3().send();
+            `;
+        };
+        junction merger;
+        transition1: Start->merger on inPort.message1
+        `
+            std::cout << "Transition 1 to merger" << std::endl;
+        `;
+        transition2: Start->merger on inPort.message2
+        `
+            std::cout << "Transition 2 to merger" << std::endl;
+        `;
+        transition3: Start->merger on inPort.message3
+        `
+            std::cout << "Transition 3 to merger" << std::endl;
+        `;
+        mergedTransition: merger->End
+        `
+            std::cout << "Going through merged transition" << std::endl;
+        `;
+
+        state End
+        {
+            entry
+            `
+                std::cout << "Entered state " << getCurrentStateString() << std::endl;
+                context()->abort();
+            `;
+        };
+    };
+};

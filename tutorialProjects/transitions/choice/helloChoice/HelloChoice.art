@@ -1,0 +1,68 @@
+protocol Protocol{
+    out message();
+};
+
+capsule Main{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    [[rt::decl]]
+    `
+        bool goLeft;
+    `
+
+    behavior port outPort : Protocol, inPort~ : Protocol;
+    connect outPort with inPort;
+
+    statemachine{
+        initial->Start
+        `
+            goLeft = false;
+        `;
+        state Start{
+            entry
+            `
+                std::cout << "Entered state " << getCurrentStateString() << std::endl;
+                std::cout << "Sending transition message" << std::endl;
+                outPort.message().send();
+            `;
+        };
+        choice leftOrRight;
+        encounteredChoice: Start->leftOrRight on inPort.message
+        `
+            std::cout << "Transition to choice" << std::endl;
+            goLeft = true;
+            //Note: Choice evaluates guard condition after leaving the current state
+            //Therefore we should go left after setting goLeft to true here.
+            //However, for a junction, this would be too late to set goLeft,
+            //since junctions evaluate guard conditions before leaving the current state 
+        `;
+        goingLeft: leftOrRight->Left when `goLeft`
+        `
+            std::cout << "Going left" << std::endl;
+        `;
+        goingRight: leftOrRight->Right when `else`
+        `
+            std::cout << "Going right" << std::endl;
+        `;
+
+        state Left
+        {
+            entry
+            `
+                std::cout << "Entered state " << getCurrentStateString() << std::endl;
+                context()->abort();
+            `;
+        };
+        state Right{
+            entry
+            `
+                std::cout << "Entered state " << getCurrentStateString() << std::endl;
+                context()->abort();
+            `;
+        };
+    };
+};

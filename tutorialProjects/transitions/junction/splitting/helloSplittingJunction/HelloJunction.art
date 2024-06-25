@@ -1,0 +1,76 @@
+protocol Protocol{
+    out message();
+};
+
+capsule Main{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    [[rt::decl]]
+    `
+        int pathChoice;
+    `
+
+    behavior port outPort : Protocol, inPort~ : Protocol;
+    connect outPort with inPort;
+
+    statemachine{
+        initial->Start;
+        state Start{
+            entry
+            `
+                std::cout << "Entered state " << getCurrentStateString() << std::endl;
+                std::cout << "Sending transition message" << std::endl;
+                outPort.message().send();
+                pathChoice = 2; //The path that will be chosen
+            `;
+        };
+        junction splitter;
+        encounteredSplitter: Start->splitter on inPort.message
+        `
+            std::cout << "Transition to splitter" << std::endl;
+            pathChoice = 1;
+            //Note: changin pathChoice here is a bad idea,
+            //since junctions evaluate guard conditions before leaving the current state
+            //the value set here will not effect the path chosen
+        `;
+        goingPathOne: splitter->PathOne when `pathChoice == 1`
+        `
+            std::cout << "Going for path 1" << std::endl;
+        `;
+        goingPathTwo: splitter->PathTwo when `pathChoice == 2`
+        `
+            std::cout << "Going for path 2" << std::endl;
+        `;
+        goingPathThree: splitter->PathThree when `else`
+        `
+            std::cout << "Going for path 3" << std::endl;
+        `;
+
+        state PathOne
+        {
+            entry
+            `
+                std::cout << "Entered state " << getCurrentStateString() << std::endl;
+                context()->abort();
+            `;
+        };
+        state PathTwo{
+            entry
+            `
+                std::cout << "Entered state " << getCurrentStateString() << std::endl;
+                context()->abort();
+            `;
+        };
+        state PathThree{
+            entry
+            `
+                std::cout << "Entered state " << getCurrentStateString() << std::endl;
+                context()->abort();
+            `;
+        };
+    };
+};
