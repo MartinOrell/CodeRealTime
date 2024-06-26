@@ -1,0 +1,36 @@
+class SenderClass  {
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+        #include "ISender.art.h"
+    `
+
+    [[rt::decl]]
+    `
+    public:
+        SenderClass(ISender*);
+    private:
+        ISender* _iSender;
+    `
+    [[rt::impl]]
+    `
+        SenderClass::SenderClass(ISender* iSender)
+        : _iSender(iSender)
+        {
+            rtg_init1();
+        }
+    `
+
+    trigger sendMessageTrigger();
+
+    statemachine {
+        state Running;
+        initial -> Running;
+        sendMessage: Running->Running on sendMessageTrigger()
+        `
+            int i = 1337;
+            std::cout << "Sender: Sending: " << i << std::endl;
+            _iSender->sendMessage(i);
+        `;
+    };
+};

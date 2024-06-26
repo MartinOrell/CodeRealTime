@@ -1,0 +1,21 @@
+capsule Main{
+    [[rt::header_preface]]
+    `
+        #include "Greeter.h"
+    `
+    [[rt::decl]]
+    `
+    private:
+        Greeter* _greeter;
+    `
+
+    statemachine {
+        state State;
+        initial -> State
+        `
+            _greeter = new Greeter();
+            _greeter->sayHello();
+            context()->abort();
+        `;
+    };
+};

@@ -1,0 +1,34 @@
+capsule Sender : `ISender`{ //inherit sendMessage function from ISender
+    [[rt::header_preface]]
+    `
+        #include "SenderClass.h"
+        #include "ISender.art.h"
+        #include <string>
+    `
+    [[rt::decl]]
+    `
+    public:
+        virtual void sendMessage(int) override; //override method defined in ISender
+
+    private:
+        SenderClass* _sender; //Sender will have responsibility of creating, using and destroying SenderClass
+    `
+
+    [[rt::impl]]
+    `
+        void Sender_Actor::sendMessage(int message){
+            messagePort.message(message).send();
+        }
+    `
+
+    service behavior port messagePort : Protocol;
+
+    statemachine {
+        state Hello;
+        initial -> Hello
+        `
+            _sender = new SenderClass(this);
+            _sender->sendMessageTrigger();
+        `;
+    };
+};

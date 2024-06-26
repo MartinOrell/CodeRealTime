@@ -1,0 +1,29 @@
+class Greeter  {
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    [[rt::decl]]
+    `
+    public:
+        Greeter();
+    `
+    [[rt::impl]]
+    `
+        Greeter::Greeter(){
+            rtg_init1(); //Execute initial transition in constructor
+        }
+    `
+
+    trigger sayHello(); //trigger used for transitions
+
+    statemachine {
+        state Hello;
+        initial -> Hello;
+        Hello->Hello on sayHello()
+        `
+            std::cout << "Hello World!" << std::endl;
+        `;
+    };
+};

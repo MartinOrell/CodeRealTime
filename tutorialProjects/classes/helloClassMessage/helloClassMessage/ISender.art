@@ -1,0 +1,10 @@
+//Sender will inherit this c++ class
+[[rt::decl]]
+`
+    class ISender{
+        public:
+            virtual void sendMessage(int) = 0;
+            //sendMessage is defined in Sender and can be accessed by SenderClass
+            //This allow SenderClass to use this method to use ports on the Sender 
+    };
+`
