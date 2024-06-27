@@ -16,7 +16,7 @@ capsule Sender : `ISender`{ //inherit sendMessage function from ISender
 
     [[rt::impl]]
     `
-        void Sender_Actor::sendMessage(int message){
+        void Sender::sendMessage(int message){
             messagePort.message(message).send();
         }
     `
