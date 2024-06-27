@@ -5,7 +5,7 @@ capsule Receiver{
         #include <iostream>
     `
 
-    publish service notify behavior unwired port messagePort~
+    publish service notify behavior unwired port senderPort~
     [[rt::properties(
         registration_name="messageService"
     )]]: Protocol;
@@ -13,11 +13,11 @@ capsule Receiver{
     statemachine{
         initial -> Receiving;
         state Receiving{
-            connected: on messagePort.rtBound
+            connected: on senderPort.rtBound
             `
                 std::cout << getName() << ": Connected to sender" << std::endl;
             `;
-            message: on messagePort.message
+            message: on senderPort.message
             `
                 int i = *((int*) rtdata);
                 std::cout << getName() << ": Received: " << i << std::endl;

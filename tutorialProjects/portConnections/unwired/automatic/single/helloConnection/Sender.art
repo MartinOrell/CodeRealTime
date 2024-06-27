@@ -5,7 +5,7 @@ capsule Sender{
         #include <iostream>
     `
 
-    subscribe service notify behavior unwired port messagePort
+    subscribe service notify behavior unwired port receiverPort
     [[rt::properties(
         registration_name="messageService"
     )]]: Protocol;
@@ -16,12 +16,12 @@ capsule Sender{
         `
             std::cout << getName() << ": Waiting for connection" << std::endl;
         `;
-        connected: WaitForConnection -> Sending on messagePort.rtBound
+        connected: WaitForConnection -> Sending on receiverPort.rtBound
         `
             std::cout << getName() << ": Connected to receiver" << std::endl;
             int i = 5;
             std::cout << getName() << ": Sending: " << i << std::endl;
-            messagePort.message(i).send();
+            receiverPort.message(i).send();
         `;
     };
 };

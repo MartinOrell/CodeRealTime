@@ -5,7 +5,7 @@ capsule Sender{
         #include <iostream>
     `
 
-    service notify behavior unwired port messagePort
+    service notify behavior unwired port receiverPort
     [[rt::properties(
         registration=application,
         registration_name="messageService"
@@ -16,14 +16,14 @@ capsule Sender{
         initial->WaitForConnection
         `
             std::cout << getName() << ": Waiting for connection" << std::endl;
-            messagePort.registerSAP("messageService");
+            receiverPort.registerSAP("messageService");
         `;
-        connected: WaitForConnection -> Sending on messagePort.rtBound
+        connected: WaitForConnection -> Sending on receiverPort.rtBound
         `
             std::cout << getName() << ": Connected to receiver" << std::endl;
             int i = 5;
             std::cout << getName() << ": Sending: " << i << std::endl;
-            messagePort.message(i).send();
+            receiverPort.message(i).send();
         `;
     };
 };

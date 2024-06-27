@@ -6,7 +6,7 @@ capsule Receiver{
         #include "macro.h"
     `
 
-    service notify behavior unwired port messagePort~
+    service notify behavior unwired port senderPort~
     [[rt::properties(
         registration=application,
         registration_name="messageService"
@@ -17,13 +17,13 @@ capsule Receiver{
         state Receiving{
             entry
             `
-                messagePort.registerSPP("messageService");
+                senderPort.registerSPP("messageService");
             `;
-            connected: on messagePort.rtBound
+            connected: on senderPort.rtBound
             `
                 std::cout << getName() << ": Connected to a sender" << std::endl;
             `;
-            message: on messagePort.message
+            message: on senderPort.message
             `
                 int i = *((int*) rtdata);
                 std::cout << getName() << ": Received: " << i << std::endl;

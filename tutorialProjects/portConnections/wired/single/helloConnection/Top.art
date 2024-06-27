@@ -2,7 +2,7 @@ capsule Top{
     part sender : Sender;
     part receiver : Receiver;
 
-    connect sender.messagePort with receiver.messagePort;
+    connect sender.receiverPort with receiver.senderPort;
 
     statemachine{
         state State;

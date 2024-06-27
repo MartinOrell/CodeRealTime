@@ -2,8 +2,8 @@ capsule Top{
     part senders : Sender[5];
     part receiver : Receiver;
 
-    connect senders.messagePort with receiver.messagePort;
-    //currently not working
+    connect senders.receiverPort with receiver.senderPort;
+    //Not working in 1.0.4
 
     behavior port timeoutTimer : Timing;
 

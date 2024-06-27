@@ -5,12 +5,12 @@ capsule Receiver{
         #include <iostream>
     `
 
-    service behavior port messagePort~ : Protocol[2];
+    service behavior port senderPort~ : Protocol[2];
 
     statemachine{
         initial -> Receiving;
         state Receiving{
-            message: on messagePort.message
+            message: on senderPort.message
             `
                 int i = *((int*) rtdata);
                 std::cout << getName() << ": Received: " << i << std::endl;
