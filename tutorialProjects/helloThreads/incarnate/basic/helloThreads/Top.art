@@ -6,7 +6,8 @@ capsule Top{
 
     [[rt::decl]]
     `
-        int _seconds;
+        int _count;
+        RTTimerId _repeatTimerId;
     `
 
     optional part worker1 : Worker;
@@ -22,30 +23,43 @@ capsule Top{
         state Running{
             entry
             `
-                tickTimer.informEvery(RTTimespec(1,0));
+                _count = 0;
+                std::cout << (std::string)getName() + ": Start repeatTimer every second\n";
+                _repeatTimerId = tickTimer.informEvery(RTTimespec(1,0));
                 timeoutTimer.informIn(RTTimespec(10,0));
                 RTActorId id;
-                std::cout << "Incarnate worker 1\n";
+                std::cout << (std::string)getName() + ": Incarnate worker 1\n";
                 id = frame.incarnate(worker1, nullptr, nullptr, L2, -1);//L2 defined in .tcjs file
                 if(!id.isValid()){
                     std::cerr << "Failed to incarnate worker 1\n";
                 }
-                std::cout << "Incarnate worker 2\n";
+                std::cout << (std::string)getName() + ": Incarnate worker 2\n";
                 id = frame.incarnate(worker2, nullptr, nullptr, L3, -1);//L3 defined in .tcjs file
                 if(!id.isValid()){
                     std::cerr << "Failed to incarnate worker 2\n";
                 }
-                std::cout << "Incarnate worker 3\n";
+                std::cout << (std::string)getName() + ": Incarnate worker 3\n";
                 id = frame.incarnate(worker3, nullptr, nullptr, L4, -1);//L4 defined in .tcjs file
                 if(!id.isValid()){
                     std::cerr << "Failed to incarnate worker 3\n";
                 }
-
             `;
             tick: on tickTimer.timeout
             `
-                _seconds++;
-                std::cout << std::to_string(_seconds) + " seconds has passed\n";
+                _count++;
+                int numTimeouts = _repeatTimerId.timeouts();
+                if(numTimeouts > 1){
+                    std::cout <<
+                        (std::string)getName() +
+                        ": Missed timeouts: " +
+                        std::to_string(numTimeouts-1) +
+                        "\n";
+                }
+                std::cout <<
+                    (std::string)getName() +
+                    ": Count: " +
+                    std::to_string(_count) +
+                    "\n";
             `;
             end: on timeoutTimer.timeout
             `

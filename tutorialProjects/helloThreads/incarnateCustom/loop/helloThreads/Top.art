@@ -6,7 +6,8 @@ capsule Top{
 
     [[rt::decl]]
     `
-        int _seconds;
+        int _count;
+        RTTimerId _repeatTimerId;
     `
 
     optional part workers : Worker[3];
@@ -20,14 +21,15 @@ capsule Top{
         state Running{
             entry
             `
-                _seconds = 0;
-                tickTimer.informEvery(RTTimespec(1,0));
+                _count = 0;
+                std::cout << (std::string)getName() + ": Start repeatTimer every second\n";
+                _repeatTimerId = tickTimer.informEvery(RTTimespec(1,0));
                 timeoutTimer.informIn(RTTimespec(10,0));
                 RTActorId id;
                 RTController* threadList[] = {L2, L3, L4}; //L2,L3,L4 defined in .tcjs file
 
                 for(int i = 0; i < 3; i++){
-                    std::cout << "Incarnate worker " + std::to_string(i) + "\n";
+                    std::cout << (std::string)getName() + ": Incarnate worker " + std::to_string(i) + "\n";
                     id = frame.incarnateCustom(
                         workers,
                         RTActorFactory(
@@ -45,8 +47,20 @@ capsule Top{
             `;
             tick: on tickTimer.timeout
             `
-                _seconds++;
-                std::cout << std::to_string(_seconds) + " seconds has passed\n";
+                _count++;
+                int numTimeouts = _repeatTimerId.timeouts();
+                if(numTimeouts > 1){
+                    std::cout <<
+                        (std::string)getName() +
+                        ": Missed timeouts: " +
+                        std::to_string(numTimeouts-1) +
+                        "\n";
+                }
+                std::cout <<
+                    (std::string)getName() +
+                    ": Count: " +
+                    std::to_string(_count) +
+                    "\n";
             `;
             end: on timeoutTimer.timeout
             `
