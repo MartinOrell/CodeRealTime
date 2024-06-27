@@ -33,7 +33,7 @@ capsule Top{
                     RTActorFactory(
                         [this](RTController* rtg_rts, RTActorRef* rtg_ref, int index)
                         {
-                            return new Worker_Actor(L2, rtg_ref); //L2 defined in .tcjs file
+                            return new Worker(L2, rtg_ref); //L2 defined in .tcjs file
                         }
                     )
                 );
@@ -48,7 +48,7 @@ capsule Top{
                     RTActorFactory(
                         [this](RTController* rtg_rts, RTActorRef* rtg_ref, int index)
                         {
-                            return new Worker_Actor(L3, rtg_ref); //L3 defined in .tcjs file
+                            return new Worker(L3, rtg_ref); //L3 defined in .tcjs file
                         }
                     )
                 );
@@ -64,7 +64,7 @@ capsule Top{
                     RTActorFactory(
                         [this](RTController* rtg_rts, RTActorRef* rtg_ref, int index)
                         {
-                            return new Worker_Actor(L4, rtg_ref); //L4 defined in .tcjs file
+                            return new Worker(L4, rtg_ref); //L4 defined in .tcjs file
                         }
                     )
                 );

@@ -33,7 +33,7 @@ capsule Top{
                         RTActorFactory(
                             [this, threadList, i](RTController* rtg_rts, RTActorRef* rtg_ref, int index)
                             {
-                                return new Worker_Actor(threadList[i], rtg_ref);
+                                return new Worker(threadList[i], rtg_ref);
                             }
                         )
                     );
