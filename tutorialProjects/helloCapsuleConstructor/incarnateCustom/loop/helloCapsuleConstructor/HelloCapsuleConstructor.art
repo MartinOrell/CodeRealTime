@@ -24,7 +24,7 @@ capsule Top{
                     RTActorFactory(
                         [this, firstName, lastName](RTController* rtg_rts, RTActorRef* rtg_ref, int index)
                         {
-                            return new Greeter_Actor(rtg_rts,rtg_ref, firstName, lastName);
+                            return new Greeter(rtg_rts,rtg_ref, firstName, lastName);
                         }
                     )
                 );
@@ -47,7 +47,7 @@ capsule Greeter{
     [[rt::decl]]
     `
         public:
-            Greeter_Actor(RTController*, RTActorRef*, std::string, std::string);
+            Greeter(RTController*, RTActorRef*, std::string, std::string);
         private:
             std::string _firstName;
             std::string _lastName;
@@ -55,7 +55,7 @@ capsule Greeter{
 
     [[rt::impl]]
     `
-        Greeter_Actor::Greeter_Actor(RTController* rtg_rts, RTActorRef* rtg_ref, std::string firstName, std::string lastName)
+        Greeter::Greeter(RTController* rtg_rts, RTActorRef* rtg_ref, std::string firstName, std::string lastName)
             :RTActor(rtg_rts, rtg_ref), _firstName(firstName), _lastName(lastName){}
     `
 

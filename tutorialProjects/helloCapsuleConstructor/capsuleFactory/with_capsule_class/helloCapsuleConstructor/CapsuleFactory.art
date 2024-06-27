@@ -27,5 +27,5 @@
 [[rt::impl]]
 `
     template<>
-    CapsuleFactory<Greeter_Actor> CapsuleFactory<Greeter_Actor>::factory("Donald", "Duck");
+    CapsuleFactory<Greeter> CapsuleFactory<Greeter>::factory("Donald", "Duck");
 `
