@@ -13,33 +13,33 @@ capsule Sender{
             entry
             `
                 int message = 3;
-                int prio = 3;
+                int prio = 3; //High Priority
                 std::cout << getName() << ": Sending " << message
-                    << " with priority " << prio << std::endl;
+                    << " with priority " << RTPriority(prio).name() << "(" << prio << ")" << std::endl;
                 messagePort.message(message).send(prio);
 
                 message = 2;
-                prio = 2;
+                prio = 2; //Panic Priority
                 std::cout << getName() << ": Sending " << message
-                    << " with priority " << prio << std::endl;
+                    << " with priority " << RTPriority(prio).name() << "(" << prio << ")" << std::endl;
                 messagePort.message(message).send(prio);
 
                 message = 6;
-                prio = 6;
+                prio = 6; //Background Priority
                 std::cout << getName() << ": Sending " << message
-                    << " with priority " << prio << std::endl;
+                    << " with priority " << RTPriority(prio).name() << "(" << prio << ")" << std::endl;
                 messagePort.message(message).send(prio);
                 
                 message = 5;
-                prio = 5;
+                prio = 5; //Low Priority
                 std::cout << getName() << ": Sending " << message
-                    << " with priority " << prio << std::endl;
+                    << " with priority " << RTPriority(prio).name() << "(" << prio << ")" << std::endl;
                 messagePort.message(message).send(prio);
 
                 message = 4;
-                prio = 4;
+                prio = 4; //General Priority (Default Priority level)
                 std::cout << getName() << ": Sending " << message
-                    << " with priority " << prio << std::endl;
+                    << " with priority " << RTPriority(prio).name() << "(" << prio << ")" << std::endl;
                 messagePort.message(message).send(prio);
             `;
         };
