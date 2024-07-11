@@ -1,0 +1,12 @@
+protocol Protocol{
+    [[rt::header_preface]]
+    `
+        #include "RaceEntryMessage.art.h"
+    `
+
+    in sendEntryMessage(`RaceEntryMessage`);
+    out start();
+    out distanceRequest();
+    in distanceResponse(`int`);
+    in goalReached();
+};

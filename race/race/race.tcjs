@@ -1,0 +1,33 @@
+let tc = TCF.define(TCF.CPP_TRANSFORM);
+tc.topCapsule = 'Top'
+tc.threads = [
+    {
+        name: 'MainThread',
+        implClass: 'RTPeerController',
+        priority: 'DEFAULT_MAIN_PRIORITY',
+        logical: [
+            'L1'
+        ]
+    },
+    {
+        name: 'TimerThread',
+        implClass: 'RTTimerController',
+        priority: 'DEFAULT_TIMER_PRIORITY'
+    },
+    {
+        name: 'RacerThread1',
+        implClass: 'RTPeerController',
+        priority: 'DEFAULT_MAIN_PRIORITY',
+        logical: [
+            'L2'
+        ]
+    },
+    {
+        name: 'RacerThread2',
+        implClass: 'RTPeerController',
+        priority: 'DEFAULT_MAIN_PRIORITY',
+        logical: [
+            'L3'
+        ]
+    },
+]

@@ -1,0 +1,72 @@
+capsule Top{
+    [[rt::header_preface]]
+    `
+        #include <vector>
+        #include "RacerProfile.art.h"
+        #include "config/GlobalMacros.h"
+    `
+
+    optional part main : Main;
+    optional part racers : Racer[`MAXNUMRACERS`];
+
+    //The Main capsule and Racer capsules are unwired,
+    //but will connect automatically
+    //Main as a publisher
+    //Racers as subscribers
+
+    behavior port frame : Frame;
+
+    statemachine{
+        state Running;
+        initial->Running
+        `
+            std::vector<Animal> animals = RACERLIST;
+            int numRacers = animals.size();
+
+            if(numRacers > MAXNUMRACERS){
+                std::cerr << "There are more racers than allowed\n"
+                << "You may want to increase MAXNUMRACERS in config/GlobalMacros.h"
+                << std::endl;
+                context()->abort();
+                return;
+            }
+
+            RTActorId id = frame.incarnateCustom
+            (
+                main,
+                RTActorFactory(
+                    [this, numRacers](RTController* rtg_rts, RTActorRef* rtg_ref, int index)
+                    {
+                        return new Main(rtg_rts,rtg_ref,numRacers);
+                    }
+                )
+            );
+            if(!id.isValid()){
+                std::cerr << "Failed to incarnate main" << std::endl;
+                context()->abort();
+                return;
+            }
+
+            std::vector<RTController*> threadList = RACERTHREADLIST;
+            for(int i = 0; i < animals.size(); i++){
+                RacerProfile profile = getProfile(animals.at(i));
+                RTController* thread = threadList.at(i%threadList.size());
+                id = frame.incarnateCustom
+                (
+                    racers,
+                    RTActorFactory(
+                        [this, thread, profile](RTController* rtg_rts, RTActorRef* rtg_ref, int index)
+                        {
+                            return new Racer(thread, rtg_ref, profile);
+                        }
+                    )
+                );
+                if(!id.isValid()){
+                    std::cerr << "Failed to incarnate racer" << std::endl;
+                    context()->abort();
+                    return;
+                }
+            }
+        `;
+    };
+};
