@@ -1,0 +1,25 @@
+capsule Client{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    subscribe notify service behavior unwired port serverPort
+        [[rt::properties(registration_name= "messageService")]]
+        : Protocol;
+
+    statemachine{
+        state WaitForConnection, End;
+        initial->WaitForConnection; //must connect before calling invoke
+        request: WaitForConnection->End on serverPort.rtBound
+        `
+            int i = (getIndex() + 1)*10;
+            std::cout << getName() << "[" << getIndex() << "]: Sending: " << i << std::endl;
+            RTMessage replyMsg;
+            serverPort.request(i).invoke(&replyMsg);
+            int r = *static_cast<int*>(replyMsg.getData());
+            std::cout << getName() << "[" << getIndex() << "]: Received: " << r << std::endl;
+        `;
+    };
+};
