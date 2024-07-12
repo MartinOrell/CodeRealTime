@@ -1,0 +1,43 @@
+/*
+This program does not work as of 1.0.4
+Getting error:
+Invoke crosses controller boundary.
+Apparently invoke does not work across multiple threads
+*/
+
+capsule Top{
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    optional part clients : Client[3];
+    part server : Server;
+
+    //connect clients.serverPort with server.clientPort;
+    //Bug with multiplicity in version 1.0.4
+    //Unwired automatic connection made at the moment (should be changed later)
+
+    behavior port frame: Frame;
+    behavior port timer: Timing;
+
+    statemachine{
+        state Running, End;
+        initial->Running
+        `
+            timer.informIn(RTTimespec(1,0));
+            RTActorId id;
+            RTController* threadList[] = {L2, L3, L4}; //L2,L3,L4 defined in .tcjs file
+            for(int i = 0; i < 3; i++){
+                id = frame.incarnate(clients, nullptr, nullptr, threadList[i], -1);
+                if(!id.isValid()){
+                    std::cerr << "Failed to incarnate client " + std::to_string(i) + "\n";
+                }
+            }
+        `;
+        Running->End on timer.timeout
+        `
+            context()->abort();
+        `;
+    };
+};
