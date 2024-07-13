@@ -1,0 +1,5 @@
+[[rt::decl]]
+`
+    #include <string>
+    typedef std::string [[rf::auto_descriptor]] TimeMessage;
+`

@@ -1,0 +1,60 @@
+capsule Digit{
+
+    [[rt::decl]]
+    `
+        int _base;
+    `
+
+    service behavior port clockPort~ : ClockDigitProtocol;
+
+    statemachine{
+        initial->Running.start
+        `
+            _base = 10;
+        `;
+        state Running{
+            entrypoint start;
+            request: on clockPort.requestDigit
+            `
+                clockPort.responseDigit(getCurrentState()-3).reply();
+            `;
+            setBase: on clockPort.setBase
+            `
+                _base = *((int*) rtdata);
+            `;
+            state Zero, One, Two, Three, Four, Five, Six, Seven, Eight, Nine;
+            start->Zero;
+            Zero->One on clockPort.inc;
+            One->Two on clockPort.inc;
+            choice isBase3;
+            Two->isBase3 on clockPort.inc;
+            isBase3->Zero when `_base == 3`
+            `
+                clockPort.carry().send();
+            `;
+            isBase3->Three when `else`;
+            choice isBase4;
+            Three->isBase4 on clockPort.inc;
+            isBase4->Zero when `_base == 4`
+            `
+                clockPort.carry().send();
+            `;
+            isBase4->Four when `else`;
+            Four->Five on clockPort.inc;
+            choice isBase6;
+            Five->isBase6 on clockPort.inc;
+            isBase6->Zero when `_base == 6`
+            `
+                clockPort.carry().send();
+            `;
+            isBase6->Six when `else`;
+            Six->Seven on clockPort.inc;
+            Seven->Eight on clockPort.inc;
+            Eight->Nine on clockPort.inc;
+            Nine->Zero on clockPort.inc
+            `
+                clockPort.carry().send();
+            `;
+        };
+    };
+};

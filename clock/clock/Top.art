@@ -1,0 +1,24 @@
+capsule Top{
+
+    part main : Main;
+    part clock : Clock;
+    part second1Digit : Digit;
+    part second10Digit : Digit;
+    part minute1Digit : Digit;
+    part minute10Digit : Digit;
+    part hour1Digit : Digit;
+    part hour10Digit : Digit;
+
+    connect main.clockPort with clock.mainPort;
+    connect clock.second1DigitPort with second1Digit.clockPort;
+    connect clock.second10DigitPort with second10Digit.clockPort;
+    connect clock.minute1DigitPort with minute1Digit.clockPort;
+    connect clock.minute10DigitPort with minute10Digit.clockPort;
+    connect clock.hour1DigitPort with hour1Digit.clockPort;
+    connect clock.hour10DigitPort with hour10Digit.clockPort;
+
+    statemachine{
+        state Running;
+        initial->Running;
+    };
+};

@@ -1,0 +1,16 @@
+protocol MainClockProtocol{
+    [[rt::header_preface]]
+    `
+        #include "TimeMessage.art.h"
+    `
+    out requestTime();
+    in respondTime(`TimeMessage`);
+};
+
+protocol ClockDigitProtocol{
+    out requestDigit();
+    in responseDigit(`int`);
+    out inc();
+    in carry();
+    out setBase(`int`);
+};

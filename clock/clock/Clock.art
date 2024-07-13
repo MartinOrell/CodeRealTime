@@ -1,0 +1,173 @@
+capsule Clock{
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+        #include "GlobalMacros.h"
+    `
+    [[rt::decl]]
+    `
+        int _tickPeriodNanoSec;
+        RTTimerId _tickerId;
+        int _timeouts;
+    `
+
+    service behavior port mainPort~ : MainClockProtocol;
+    service behavior port second1DigitPort : ClockDigitProtocol;
+    service behavior port second10DigitPort : ClockDigitProtocol;
+    service behavior port minute1DigitPort : ClockDigitProtocol;
+    service behavior port minute10DigitPort : ClockDigitProtocol;
+    service behavior port hour1DigitPort : ClockDigitProtocol;
+    service behavior port hour10DigitPort : ClockDigitProtocol;
+
+    behavior port ticker : Timing;
+
+    statemachine{
+        initial->Running.ep
+        `
+            second10DigitPort.setBase(6).send();
+            minute10DigitPort.setBase(6).send();
+            hour10DigitPort.setBase(3).send();
+
+            _tickPeriodNanoSec = 1000000000/SPEEDMULTIPLIER;
+            _tickerId = ticker.informEvery(RTTimespec(0,_tickPeriodNanoSec));
+        `;
+        state Running
+        {
+            entrypoint ep;
+            state SecondTicker, Second10Ticker, MinuteTicker, Minute10Ticker, HourTicker;
+            choice isSecondTickerTooFast, isSecond10TickerTooFast, isMinuteTickerTooFast, isMinute10TickerTooFast;
+            
+            ep->SecondTicker;
+
+            SecondTicker->isSecondTickerTooFast on ticker.timeout
+            `
+                second1DigitPort.inc().send();
+                _timeouts = _tickerId.timeouts();
+            `;
+            secondIsNotTooFast: isSecondTickerTooFast->SecondTicker when `_timeouts < 2`;
+            secondIsTooFast: isSecondTickerTooFast->Second10Ticker when `else`
+            `
+                ticker.cancelTimer(_tickerId);
+                _tickPeriodNanoSec *= 10;
+                _tickerId = ticker.informEvery(RTTimespec(0,_tickPeriodNanoSec));
+                std::cout << "Ticking in 10 seconds interval due to "
+                    << _timeouts-1 << " missed timeouts." << std::endl;
+            `;
+
+            Second10Ticker->isSecond10TickerTooFast on ticker.timeout
+            `
+                second10DigitPort.inc().send();
+                _timeouts = _tickerId.timeouts();
+            `;
+            second10IsNotTooFast: isSecond10TickerTooFast->Second10Ticker when `_timeouts < 2`;
+            second10IsTooFast: isSecond10TickerTooFast->MinuteTicker when `else`
+            `
+                std::cout << "Ticking in 1 minute interval due to "
+                    << _timeouts-1 << " missed timeouts." << std::endl;
+
+                ticker.cancelTimer(_tickerId);
+                _tickPeriodNanoSec *= 6;
+                _tickerId = ticker.informEvery(RTTimespec(0,_tickPeriodNanoSec));
+            `;
+
+            MinuteTicker->isMinuteTickerTooFast on ticker.timeout
+            `
+                minute1DigitPort.inc().send();
+                _timeouts = _tickerId.timeouts();
+            `;
+            minuteIsNotTooFast: isMinuteTickerTooFast->MinuteTicker when `_timeouts < 2`;
+            minuteIsTooFast: isMinuteTickerTooFast->Minute10Ticker when `else`
+            `
+                std::cout << "Ticking in 10 minutes interval due to "
+                    << _timeouts-1 << " missed timeouts." << std::endl;
+
+                ticker.cancelTimer(_tickerId);
+                _tickPeriodNanoSec *= 10;
+                _tickerId = ticker.informEvery(RTTimespec(0,_tickPeriodNanoSec));
+            `;
+
+            Minute10Ticker->isMinute10TickerTooFast on ticker.timeout
+            `
+                minute10DigitPort.inc().send();
+                _timeouts = _tickerId.timeouts();
+            `;
+            minute10IsNotTooFast: isMinute10TickerTooFast->Minute10Ticker when `_timeouts < 2`;
+            minute10IsTooFast: isMinute10TickerTooFast->HourTicker when `else`
+            `
+                std::cout << "Ticking in 1 hour interval due to "
+                    << _timeouts-1 << " missed timeouts." << std::endl;
+
+                ticker.cancelTimer(_tickerId);
+                _tickPeriodNanoSec *= 6;
+                _tickerId = ticker.informEvery(RTTimespec(0,_tickPeriodNanoSec));
+            `;
+
+            HourTicker->HourTicker on ticker.timeout
+            `
+                hour1DigitPort.inc().send();
+            `;
+            
+            on second1DigitPort.carry
+            `
+                second10DigitPort.inc().send();
+            `;
+            on second10DigitPort.carry
+            `
+                minute1DigitPort.inc().send();
+            `;
+            on minute1DigitPort.carry
+            `
+                minute10DigitPort.inc().send();
+            `;
+            on minute10DigitPort.carry
+            `
+                hour1DigitPort.inc().send();
+            `;
+            on hour1DigitPort.carry
+            `
+                //If we get to 20 hours, then next 10x carry should be at 24 (4)
+                RTMessage replyMsg;
+                hour10DigitPort.requestDigit().invoke(&replyMsg);
+                int hour10Digit = *static_cast<int*>(replyMsg.getData());
+                if(hour10Digit == 1){//Will be 2 after inc
+                    hour1DigitPort.setBase(4).send();
+                }
+
+                hour10DigitPort.inc().send();
+                
+            `;
+            on hour10DigitPort.carry
+            `
+                hour1DigitPort.setBase(10).send(); //Reset base to 10
+            `;
+
+            on mainPort.requestTime
+            `
+                RTMessage replyMsg;
+                second1DigitPort.requestDigit().invoke(&replyMsg);
+                int second1Digit = *static_cast<int*>(replyMsg.getData());
+                second10DigitPort.requestDigit().invoke(&replyMsg);
+                int second10Digit = *static_cast<int*>(replyMsg.getData());
+                minute1DigitPort.requestDigit().invoke(&replyMsg);
+                int minute1Digit = *static_cast<int*>(replyMsg.getData());
+                minute10DigitPort.requestDigit().invoke(&replyMsg);
+                int minute10Digit = *static_cast<int*>(replyMsg.getData());
+                hour1DigitPort.requestDigit().invoke(&replyMsg);
+                int hour1Digit = *static_cast<int*>(replyMsg.getData());
+                hour10DigitPort.requestDigit().invoke(&replyMsg);
+                int hour10Digit = *static_cast<int*>(replyMsg.getData());
+
+                std::string time =
+                    std::to_string(hour10Digit) +
+                    std::to_string(hour1Digit) +
+                    ":" +
+                    std::to_string(minute10Digit) +
+                    std::to_string(minute1Digit) +
+                    ":" +
+                    std::to_string(second10Digit) +
+                    std::to_string(second1Digit);
+                mainPort.respondTime(time).send();
+            `;
+        };
+    };
+};

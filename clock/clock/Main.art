@@ -1,0 +1,35 @@
+capsule Main{
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+        #include "GlobalMacros.h"
+    `
+
+    behavior port endTimer : Timing;
+    behavior port updateTimer : Timing;
+
+    service behavior port clockPort : MainClockProtocol;
+
+    statemachine{
+        state WaitForTimeResponse, Running, End;
+        initial->Running
+        `
+            endTimer.informIn(RTTimespec(TIMEOUTSEC,0));
+            updateTimer.informEvery(RTTimespec(0,1000000000/FPS));
+        `;
+        Running->WaitForTimeResponse on updateTimer.timeout
+        `
+            clockPort.requestTime().send();
+        `;
+        WaitForTimeResponse->Running on clockPort.respondTime
+        `
+            std::string time = *((std::string*) rtdata);
+            std::cout << "Time: " << time << std::endl;
+        `;
+        Running->End on endTimer.timeout
+        `
+            std::cout << "Main timeout reached" << std::endl;
+            context()->abort();
+        `;
+    };
+};

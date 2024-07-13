@@ -1,0 +1,8 @@
+#ifndef GLOBAL_MACROS_H
+#define GLOBAL_MACROS_H
+
+#define SPEEDMULTIPLIER 100000
+#define FPS 3
+#define TIMEOUTSEC 3600
+
+#endif
