@@ -1,5 +1,4 @@
-#ifndef Shield_h
-#define Shield_h
+#pragma once
 
 #include <iostream>
 
@@ -12,5 +11,3 @@ class Shield{
         int _defence;
         int _durability;
 };
-
-#endif /* Shield_h */

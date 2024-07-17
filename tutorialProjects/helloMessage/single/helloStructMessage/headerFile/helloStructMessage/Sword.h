@@ -1,9 +1,6 @@
-#ifndef Sword_h
-#define Sword_h
+#pragma once
 
 struct Sword{
     int attack;
     int durability;
 };
-
-#endif /* Sword_h */

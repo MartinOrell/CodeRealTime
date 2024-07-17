@@ -1,8 +1,5 @@
-#ifndef Race_h
-#define Race_h
+#pragma once
 
 enum Race{
     human, angel, demon
 };
-
-#endif /* Race_h */

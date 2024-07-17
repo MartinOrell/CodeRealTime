@@ -1,5 +1,4 @@
-#ifndef RACEPRINTER_H
-#define RACEPRINTER_H
+#pragma once
 
 #include <iostream>
 #include <fstream>
@@ -30,5 +29,3 @@ class RacePrinter{
         std::vector<std::string> _track;
         std::vector<Racer> _racers;
 };
-
-#endif
