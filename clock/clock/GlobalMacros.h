@@ -1,8 +1,5 @@
-#ifndef GLOBAL_MACROS_H
-#define GLOBAL_MACROS_H
+#pragma once
 
-#define SPEEDMULTIPLIER 100000
+#define SPEEDMULTIPLIER 8
 #define FPS 3
 #define TIMEOUTSEC 3600
-
-#endif
