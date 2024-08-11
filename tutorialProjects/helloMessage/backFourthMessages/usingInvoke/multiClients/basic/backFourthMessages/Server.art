@@ -5,9 +5,7 @@ capsule Server{
         #include <iostream>
     `
 
-    publish service behavior unwired port clientPort~
-        [[rt::properties(registration_name= "messageService")]]
-        : Protocol[3];
+    service behavior port clientPort~: Protocol[3];
 
     statemachine{
         initial -> Running;

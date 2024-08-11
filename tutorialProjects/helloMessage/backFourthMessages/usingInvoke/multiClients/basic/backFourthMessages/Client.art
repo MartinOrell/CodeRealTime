@@ -5,9 +5,7 @@ capsule Client{
         #include <iostream>
     `
 
-    subscribe notify service behavior unwired port serverPort
-        [[rt::properties(registration_name= "messageService")]]
-        : Protocol;
+    notify service behavior port serverPort: Protocol;
 
     statemachine{
         state WaitForConnection, End;
