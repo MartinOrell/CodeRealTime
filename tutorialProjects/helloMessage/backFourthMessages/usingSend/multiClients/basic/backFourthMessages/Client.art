@@ -5,20 +5,18 @@ capsule Client{
         #include <iostream>
     `
 
-    subscribe notify service behavior unwired port messagePort : Protocol;
+    service behavior port serverPort : Protocol;
 
     statemachine{
         
-
-        state WaitForConnection, WaitForResponse, End;
-        initial->WaitForConnection;
-        sendRequest: WaitForConnection->WaitForResponse on messagePort.rtBound
+        state WaitForResponse, End;
+        initial->WaitForResponse
         `
-            int i = 5;
+            int i = (getIndex()+1)*10;
             std::cout << getName() << "[" << getIndex() << "]: Sending: " << i << std::endl;
-            messagePort.request(i).send();
+            serverPort.request(i).send();
         `;
-        receiveResponse: WaitForResponse->End on messagePort.response
+        receiveResponse: WaitForResponse->End on serverPort.response
         `
             int i = *((int*) rtdata);
             std::cout << getName() << "[" << getIndex() << "]: Received: " << i << std::endl;
