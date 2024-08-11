@@ -11,7 +11,7 @@ capsule Sender{
         state Sending;
         initial->Sending
         `
-            int i = 5;
+            int i = (std::string(getName())).back()-'0';
             std::cout << getName() << ": Sending: " << i << std::endl;
             receiverPort.message(i).send();
         `;

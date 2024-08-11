@@ -5,7 +5,6 @@ capsule Top{
 
     connect sender1.receiverPort with receiver.senderPort;
     connect sender2.receiverPort with receiver.senderPort;
-    //Not working in 1.0.4
 
     behavior port timeoutTimer : Timing;
 
