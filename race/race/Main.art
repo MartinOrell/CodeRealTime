@@ -20,7 +20,7 @@ capsule Main{
             int _winnerId;
             std::vector<int> _racersXPos;
             std::vector<std::string> _racerNames;
-            std::vector<int> _racerPortIds;
+            std::vector<int> _racersPortId;
     `
 
     [[rt::impl]]
@@ -29,17 +29,14 @@ capsule Main{
         : RTActor(rtg_rts, rtg_ref)
         , _racerNames(numRacers,"") //Will be set after connection
         , _racersXPos(numRacers,0) //All racers start at x=0
-        , _racerPortIds(numRacers,-1) //Will be set after connection
+        , _racersPortId(numRacers,-1) //Will be set after connection
         , _updateTime(FPS<=1 ? RTTimespec(1,0) : RTTimespec(0,1000000000/FPS))
         {}
     `
 
     behavior port updateTimer : Timing;
 
-    publish service behavior unwired port messagePort
-    [[rt::properties(
-        registration_name="messageService"
-    )]]: Protocol[`MAXNUMRACERS`];
+    service behavior port racersPort: Protocol[`MAXNUMRACERS`];
 
     statemachine{
         state ConnectingRacers;
@@ -47,14 +44,14 @@ capsule Main{
         `
             _messageCounter = 0;
         `;
-        ConnectingRacers->isAllRacersConnected on messagePort.sendEntryMessage
+        ConnectingRacers->isAllRacersConnected on racersPort.sendEntryMessage
         `
             _messageCounter++;
 
             RaceEntryMessage messageData = *((RaceEntryMessage*) rtdata);
             int connectionId = (*getMsg()).sapIndex0();
 
-            _racerPortIds.at(connectionId) = messageData.id;
+            _racersPortId.at(connectionId) = messageData.id;
             _racerNames.at(connectionId) = messageData.name;
             _racePrinter.addRacer(messageData.id, messageData.filename);
 
@@ -68,7 +65,7 @@ capsule Main{
             _racePrinter.initPrint();
             std::cout << "The race has started!" << std::endl;
             for(int i = 0; i < _racerNames.size(); i++){
-                messagePort.start().sendAt(i);
+                racersPort.start().sendAt(i);
             }
             _updateTimerId = updateTimer.informEvery(_updateTime);
             _racePrinter.print(_racersXPos);
@@ -77,17 +74,17 @@ capsule Main{
         regularUpdate: WaitForUpdate->GetPositions on updateTimer.timeout
         `
             for(int i = 0; i < _racerNames.size(); i++){
-                messagePort.distanceRequest().sendAt(i);
+                racersPort.distanceRequest().sendAt(i);
             }
             _messageCounter = 0;
         `;
         state GetPositions;
-        getMessage: GetPositions->isAllPositionsRetrieved on messagePort.distanceResponse
+        getMessage: GetPositions->isAllPositionsRetrieved on racersPort.distanceResponse
         `
             _messageCounter++;
             const int position = *((int*) rtdata);
             const int index = (*getMsg()).sapIndex0();
-            _racersXPos.at(_racerPortIds.at(index)) = position;
+            _racersXPos.at(_racersPortId.at(index)) = position;
         `;
         choice isAllPositionsRetrieved;
         allPositionsNotRetrieved: isAllPositionsRetrieved->GetPositions when
@@ -97,25 +94,25 @@ capsule Main{
         `
             _racePrinter.print(_racersXPos);
         `;
-        goalReached: WaitForUpdate->GetPositions2 on messagePort.goalReached
+        goalReached: WaitForUpdate->GetPositions2 on racersPort.goalReached
         `
             updateTimer.cancelTimer(_updateTimerId);
             _winnerId = (*getMsg()).sapIndex0();
-            _racersXPos.at(_racerPortIds.at(_winnerId)) = GOAL;
+            _racersXPos.at(_racersPortId.at(_winnerId)) = GOAL;
             for(int i = 0; i < _racerNames.size(); i++){
                 if(i != _winnerId){
-                    messagePort.distanceRequest().sendAt(i);
+                    racersPort.distanceRequest().sendAt(i);
                 }
             }
             _messageCounter = 0;
         `;
         state GetPositions2;
-        getMessage2: GetPositions2->isAllPositionsRetrieved2 on messagePort.distanceResponse
+        getMessage2: GetPositions2->isAllPositionsRetrieved2 on racersPort.distanceResponse
         `
             _messageCounter++;
             const int position = *((int*) rtdata);
             const int index = (*getMsg()).sapIndex0();
-            _racersXPos.at(_racerPortIds.at(index)) = position;
+            _racersXPos.at(_racersPortId.at(index)) = position;
         `;
         choice isAllPositionsRetrieved2;
         allPositionsNotRetrieved2: isAllPositionsRetrieved2->GetPositions2 when

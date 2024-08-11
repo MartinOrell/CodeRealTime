@@ -9,10 +9,7 @@ capsule Top{
     optional part main : Main;
     optional part racers : Racer[`MAXNUMRACERS`];
 
-    //The Main capsule and Racer capsules are unwired,
-    //but will connect automatically
-    //Main as a publisher
-    //Racers as subscribers
+    connect main.racersPort with racers.mainPort;
 
     behavior port frame : Frame;
 
