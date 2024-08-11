@@ -12,9 +12,7 @@ capsule Top{
     part server : Server;
     optional part clients : Client[3];
 
-    //connect clients.serverPort with server.clientPort;
-    //Bug with multiplicity in version 1.0.3
-    //Unwired automatic connection made at the moment (should be changed later)
+    connect clients.serverPort with server.clientPort;
 
     behavior port frame : Frame;
     behavior port timeoutTimer : Timing;
