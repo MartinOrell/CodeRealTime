@@ -11,8 +11,8 @@ capsule Sender{
         state Sending{
             entry
             `
-                int i = 5;
-                std::cout << getName() << ": Sending: " << i << std::endl;
+                int i = getIndex();
+                std::cout << getName() << "[" << getIndex() << "]: Sending: " << i << std::endl;
                 receiverPort.message(i).send();
             `;
         };
