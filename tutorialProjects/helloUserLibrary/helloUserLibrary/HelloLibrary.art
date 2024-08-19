@@ -1,0 +1,18 @@
+capsule HelloLibrary{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+        #include "sum.h"
+    `
+
+    statemachine{
+        state Hello;
+        initial->Hello
+        `
+            int a = sum(2,3);
+            std::cout << "2 + 3 = " << a << std::endl;
+            context()->abort();
+        `;
+    };
+};

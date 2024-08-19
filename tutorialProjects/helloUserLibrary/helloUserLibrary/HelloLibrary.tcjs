@@ -1,0 +1,8 @@
+let tc = TCF.define(TCF.CPP_TRANSFORM);
+tc.topCapsule = 'HelloLibrary'
+tc.userLibraries = [
+    "../../sumLib/build/libsumLib.a"
+];
+tc.inclusionPaths = [
+    "../../sumLib/include"
+]
