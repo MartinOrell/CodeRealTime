@@ -27,18 +27,13 @@ capsule HelloTimer{
     behavior port endTimer : Timing;
 
     statemachine{
-        initial->Hello;
-        state Hello{
-            entry
-            `
-                std::cout << "Hello World" << std::endl;
-                _updateTimerId = repeatTimer.informEvery(_updateTime);
-                endTimer.informIn(_runDuration);
-            `;
-            exit
-            `
-                repeatTimer.cancelTimer(_updateTimerId);
-            `;
+        initial->Running
+        `
+            std::cout << "Hello World" << std::endl;
+            _updateTimerId = repeatTimer.informEvery(_updateTime);
+            endTimer.informIn(_runDuration);
+        `;
+        state Running{
             timeout: on repeatTimer.timeout
             `
                 for(int i = 0; i < _updateTimerId.timeouts(); i++){
@@ -46,9 +41,10 @@ capsule HelloTimer{
                 }
             `;
         };
-        Hello->End on endTimer.timeout
+        Running->End on endTimer.timeout
         `
             std::cout << "Goodbye World" << std::endl;
+            repeatTimer.cancelTimer(_updateTimerId);
             context()->abort();
         `;
         state End;
