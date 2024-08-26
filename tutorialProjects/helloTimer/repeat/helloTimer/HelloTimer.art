@@ -7,7 +7,20 @@ capsule HelloTimer{
 
     [[rt::decl]]
     `
-        RTTimerId repeatTimerId;
+        public:
+            HelloTimer(RTController*, RTActorRef*, RTTimespec updateTime, RTTimespec runDuration);
+        private:
+            RTTimerId _updateTimerId;
+            RTTimespec _updateTime;
+            RTTimespec _runDuration;
+    `
+
+    [[rt::impl]]
+    `
+        HelloTimer::HelloTimer(RTController* rtg_rts, RTActorRef* rtg_ref, RTTimespec updateTime, RTTimespec runDuration)
+        : RTActor(rtg_rts, rtg_ref)
+        , _updateTime(updateTime)
+        , _runDuration(runDuration){}
     `
 
     behavior port repeatTimer : Timing;
@@ -19,16 +32,16 @@ capsule HelloTimer{
             entry
             `
                 std::cout << "Hello World" << std::endl;
-                repeatTimerId = repeatTimer.informEvery(RTTimespec(0,500000000));
-                endTimer.informIn(RTTimespec(3,0));
+                _updateTimerId = repeatTimer.informEvery(_updateTime);
+                endTimer.informIn(_runDuration);
             `;
             exit
             `
-                repeatTimer.cancelTimer(repeatTimerId);
+                repeatTimer.cancelTimer(_updateTimerId);
             `;
             timeout: on repeatTimer.timeout
             `
-                for(int i = 0; i < repeatTimerId.timeouts(); i++){
+                for(int i = 0; i < _updateTimerId.timeouts(); i++){
                     std::cout << "Hello World" << std::endl;
                 }
             `;

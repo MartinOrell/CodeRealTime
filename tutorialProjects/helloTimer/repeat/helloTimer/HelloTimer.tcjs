@@ -1,2 +1,2 @@
 let tc = TCF.define(TCF.CPP_TRANSFORM);
-tc.topCapsule = 'HelloTimer'
+tc.topCapsule = 'Top'

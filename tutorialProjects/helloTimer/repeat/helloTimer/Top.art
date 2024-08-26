@@ -1,0 +1,14 @@
+capsule Top{
+
+    part helloTimer : HelloTimer [[rt::create]]
+    `
+        RTTimespec updateTime = RTTimespec(0,500000000);
+        RTTimespec endTime = RTTimespec(3,0);
+        return new HelloTimer(rtg_rts, rtg_ref, updateTime, endTime);
+    `;
+
+    statemachine{
+        state S;
+        initial->S;
+    };
+};
