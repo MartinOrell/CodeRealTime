@@ -6,10 +6,13 @@ capsule Top{
         #include "config/GlobalMacros.h"
     `
 
-    optional part main : Main;
-    optional part racers : Racer[`MAXNUMRACERS`];
+    part main : Main;
+    optional part ui : UI;
+    optional part racers : Racer[2];
 
+    connect main.uiPort with ui.mainPort;
     connect main.racersPort with racers.mainPort;
+    connect ui.racersPort with racers.uiPort;
 
     behavior port frame : Frame;
 
@@ -30,16 +33,16 @@ capsule Top{
 
             RTActorId id = frame.incarnateCustom
             (
-                main,
+                ui,
                 RTActorFactory(
                     [this, numRacers](RTController* rtg_rts, RTActorRef* rtg_ref, int index)
                     {
-                        return new Main(rtg_rts,rtg_ref,numRacers);
+                        return new UI(rtg_rts,rtg_ref,numRacers);
                     }
                 )
             );
             if(!id.isValid()){
-                std::cerr << "Failed to incarnate main" << std::endl;
+                std::cerr << "Failed to incarnate ui" << std::endl;
                 context()->abort();
                 return;
             }
