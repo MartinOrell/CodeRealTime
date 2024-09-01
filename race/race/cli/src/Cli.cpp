@@ -1,6 +1,6 @@
-#include "RacePrinter.h"
+#include "Cli.h"
 
-void RacePrinter::initTrack(int trackHeight, int airHeight){
+void Cli::initTrack(int trackHeight, int airHeight){
     
     std::string airLine = std::string(PRINTWIDTH, ' ');
     std::string trackEdgeLine =
@@ -35,9 +35,9 @@ void RacePrinter::initTrack(int trackHeight, int airHeight){
     }
 }
 
-RacePrinter::RacePrinter(){}
+Cli::Cli(){}
 
-void RacePrinter::addRacer(int id, std::string asciiFilename){
+void Cli::addRacer(int id, std::string asciiFilename){
     
     Racer racer;
     racer.id = id;
@@ -66,7 +66,7 @@ void RacePrinter::addRacer(int id, std::string asciiFilename){
 }
 
 //initPrint should be called after all racers have been added
-void RacePrinter::initPrint(){
+void Cli::initPrint(){
     //Sort racers by id to give them correct positions
     std::sort(_racers.begin(),_racers.end(),[](Racer &a, Racer &b){return a.id<b.id;});
 
@@ -102,7 +102,7 @@ void RacePrinter::initPrint(){
     initTrack(trackHeight, airHeight);
 }
 
-void RacePrinter::print(std::vector<int> stepPositions){
+void Cli::print(std::vector<int> stepPositions){
 
     //Update positions for racers
     for(int i = 0; i < _racers.size(); i++){

@@ -4,7 +4,7 @@ capsule UI{
     `
         #include <iostream>
         #include <vector>
-        #include <cli/RacePrinter.h>
+        #include <cli/include/Cli.h>
         #include "config/GlobalMacros.h"
     `
 
@@ -16,7 +16,7 @@ capsule UI{
             int _messageCounter; //used for counting messages
             RTTimerId _updateTimerId;
             RTTimespec _updateTime;
-            RacePrinter _racePrinter;
+            Cli _ui;
             std::vector<int> _racersXPos;
             std::vector<std::string> _racerNames;
             std::vector<int> _racersPortId;
@@ -55,7 +55,7 @@ capsule UI{
 
             _racersPortId.at(connectionId) = messageData.id;
             _racerNames.at(connectionId) = messageData.name;
-            _racePrinter.addRacer(messageData.id, messageData.filename);
+            _ui.addRacer(messageData.id, messageData.filename);
         `;
 
         allRacersNotConnected: isAllRacersConnected->ConnectingRacers when
@@ -64,7 +64,7 @@ capsule UI{
         `;
         allRacersConnected: isAllRacersConnected->WaitForStartSignal when `else`
         `
-            _racePrinter.initPrint();
+            _ui.initPrint();
             mainPort.readySignal().send();
         `;
         WaitForStartSignal->Running.entryPoint on mainPort.startSignal
@@ -78,7 +78,7 @@ capsule UI{
             state WaitForUpdate, GetPositions;
             entryPoint->WaitForUpdate
             `
-                _racePrinter.print(_racersXPos);
+                _ui.print(_racersXPos);
             `;
             WaitForUpdate->GetPositions on updateTimer.timeout
             `
@@ -101,7 +101,7 @@ capsule UI{
             `;
             allPositionsRetrieved: isAllPositionsRetrieved->WaitForUpdate when `else`
             `
-                _racePrinter.print(_racersXPos);
+                _ui.print(_racersXPos);
             `;
         };
         Running->End.entryPoint on mainPort.finishMessage
@@ -133,7 +133,7 @@ capsule UI{
             `;
             allPositionsRetrieved: isAllPositionsRetrieved->End when `else`
             `
-                _racePrinter.print(_racersXPos);
+                _ui.print(_racersXPos);
                 context()->abort();
             `;
         };

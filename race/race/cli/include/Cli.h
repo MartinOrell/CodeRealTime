@@ -9,9 +9,11 @@
 #include "config/RacePrinterMacros.h"
 #include "config/GlobalMacros.h"
 
-class RacePrinter{
+class Cli{
+//Command-line interface
+
     public:
-        RacePrinter();
+        Cli();
         void addRacer(int id, std::string asciiFilename);
         void initPrint();
         void print(std::vector<int>);
