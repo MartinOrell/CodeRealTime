@@ -16,7 +16,8 @@ class Cli{
         Cli();
         void addRacer(int id, std::string asciiFilename);
         void initPrint();
-        void print(std::vector<int>);
+        void printText(std::string text);
+        void update(std::vector<int>);
     private:
         void initTrack(int trackHeight, int airHeight);
 

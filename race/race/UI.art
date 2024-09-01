@@ -2,7 +2,7 @@ capsule UI{
 
     [[rt::header_preface]]
     `
-        #include <iostream>
+        #include <string>
         #include <vector>
         #include <cli/include/Cli.h>
         #include "config/GlobalMacros.h"
@@ -69,7 +69,7 @@ capsule UI{
         `;
         WaitForStartSignal->Running.entryPoint on mainPort.startSignal
         `
-            std::cout << "The race has started!" << std::endl;
+            _ui.printText("The race has started!");
             _updateTimerId = updateTimer.informEvery(_updateTime);
         `;
 
@@ -78,7 +78,7 @@ capsule UI{
             state WaitForUpdate, GetPositions;
             entryPoint->WaitForUpdate
             `
-                _ui.print(_racersXPos);
+                _ui.update(_racersXPos);
             `;
             WaitForUpdate->GetPositions on updateTimer.timeout
             `
@@ -101,13 +101,13 @@ capsule UI{
             `;
             allPositionsRetrieved: isAllPositionsRetrieved->WaitForUpdate when `else`
             `
-                _ui.print(_racersXPos);
+                _ui.update(_racersXPos);
             `;
         };
         Running->End.entryPoint on mainPort.finishMessage
         `
             const int winnerId = *((int*) rtdata);
-            std::cout << _racerNames.at(winnerId) << " won!" << std::endl;
+            _ui.printText(_racerNames.at(winnerId) + " won!");
         `;
         state End{
             entrypoint entryPoint;
@@ -133,7 +133,7 @@ capsule UI{
             `;
             allPositionsRetrieved: isAllPositionsRetrieved->End when `else`
             `
-                _ui.print(_racersXPos);
+                _ui.update(_racersXPos);
                 context()->abort();
             `;
         };

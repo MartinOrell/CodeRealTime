@@ -102,7 +102,11 @@ void Cli::initPrint(){
     initTrack(trackHeight, airHeight);
 }
 
-void Cli::print(std::vector<int> stepPositions){
+void Cli::printText(std::string text){
+    std::cout << text << std::endl;
+}
+
+void Cli::update(std::vector<int> stepPositions){
 
     //Update positions for racers
     for(int i = 0; i < _racers.size(); i++){
