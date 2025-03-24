@@ -1,0 +1,27 @@
+capsule Parent{
+
+    [[rt::header_preface]]
+    `
+        #include <iostream>
+    `
+
+    part child : Child;
+
+    service behavior port childPort : Protocol;
+
+    connect childPort with child.parentPort;
+
+    statemachine{
+        initial -> Running
+        `
+            childPort.message().send();
+        `;
+        state Running{
+            message: on childPort.message
+            `
+                std::cout << "Parent: Message received" << std::endl;
+                context()->abort();
+            `;
+        };
+    };
+};
